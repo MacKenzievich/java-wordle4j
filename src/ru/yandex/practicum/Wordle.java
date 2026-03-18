@@ -12,6 +12,13 @@ package ru.yandex.practicum;
 public class Wordle {
 
     public static void main(String[] args) {
+        WordleDictionaryLoader loader = new WordleDictionaryLoader();
+        WordleDictionary dictionary = loader.getDictionary(); // присвоили ссылку на объект.
+
+        for (String word : dictionary.getWords()){
+            System.out.println(word);
+        }
+        System.out.println(dictionary.getWords().size());
 
     }
 
