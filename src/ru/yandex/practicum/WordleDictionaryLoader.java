@@ -6,4 +6,5 @@ package ru.yandex.practicum;
     на выходе должен быть класс WordleDictionary
  */
 public class WordleDictionaryLoader {
+
 }
