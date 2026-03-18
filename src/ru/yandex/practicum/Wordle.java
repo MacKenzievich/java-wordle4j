@@ -13,12 +13,9 @@ public class Wordle {
 
     public static void main(String[] args) {
         WordleDictionaryLoader loader = new WordleDictionaryLoader();
-        WordleDictionary dictionary = loader.getDictionary(); // присвоили ссылку на объект.
-
-        for (String word : dictionary.getWords()){
-            System.out.println(word);
-        }
-        System.out.println(dictionary.getWords().size());
+        WordleDictionary dictionary = loader.getDictionary(); // получили валидный список слов
+        WordleGame game = new WordleGame(dictionary);
+        game.proc
 
     }
 

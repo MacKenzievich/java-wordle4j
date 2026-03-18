@@ -10,13 +10,14 @@ public class WordleDictionaryLoader {       //полностью инкапсу�
     private static final Charset encoding = StandardCharsets.UTF_8;
     private WordleDictionary dictionary;
 
-    public WordleDictionaryLoader(){
+    public WordleDictionaryLoader() {
         this.dictionary = fileLoader();
     }
 
-    public WordleDictionary getDictionary(){
+    public WordleDictionary getDictionary() {
         return dictionary;
     }
+
     private WordleDictionary fileLoader() {
         List<String> listWords = new LinkedList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader
