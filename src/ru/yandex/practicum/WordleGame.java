@@ -41,7 +41,7 @@ public class WordleGame {
     }
 
     public String getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
-            NotFoundWordInDictionaryExeption { // сохраняем слово в список ответов.
+            NotFoundWordInDictionaryExeption {
         userAnswers.add(userWordValidations(userWord)); // если прошло валидацию, сохраняем в список ответов.
         lastAnswer = userWord; // если не пройдет валидацию выше и так будет exeption;
         return checkIsGameOver();
@@ -52,7 +52,7 @@ public class WordleGame {
             NotFoundWordInDictionaryExeption { // проверяем на длину слова и русские буквы
         userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
         if (userWord.isEmpty()) {
-             // Вызвать метод подсказки
+            // Вызвать метод подсказки
         }
         if (userWord.length() != 5) {
             throw new WordLengthExeption("Слово должно состоять из 5 букв!");
@@ -60,17 +60,14 @@ public class WordleGame {
         if (!userWord.matches("[а-я]+")) {
             throw new OnlyRussionWordsExeption("Слово должно состоять только из русских букв!");
         }
-        if (!dictionary.getWords().contains(userWord)){
-            throw new NotFoundWordInDictionaryExeption("Введеного слова нет в словаре!");
+        if (!dictionary.getWords().contains(userWord)) {
+            throw new NotFoundWordInDictionaryExeption("Введенного слова нет в словаре!");
         }
         return userWord;
     }
 
-    private boolean isCorrectAnswer() {
-        return answer.equals(lastAnswer);
-    }
 
-    private String checkIsGameOver() {              //Проверяем состояние игры.
+    private String checkIsGameOver() {          //Проверяем состояние игры.
         if (steps == attempts) {
             isGameOver = true;
             return "Попытки закончились: загаданное слово " + answer;
@@ -80,6 +77,16 @@ public class WordleGame {
         }
         countSteps();
         return getEncryptedAnswer();
+    }
+
+
+    private boolean isCorrectAnswer() {
+        return answer.equals(lastAnswer);
+    }
+
+
+    private void countSteps() { // увеличиваем количество потраченых попыток
+        steps++;
     }
 
 
@@ -115,10 +122,6 @@ public class WordleGame {
         return sb.toString();
     }
 
-
-    private int countSteps() { // увеличиваем количество потраченых попыток
-        return steps++;
-    }
 
     public boolean isGameOver() {
         return isGameOver;
