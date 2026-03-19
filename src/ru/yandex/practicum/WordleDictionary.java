@@ -14,7 +14,11 @@ public class WordleDictionary {
     }
 
     public String getWordForGame() {   // получаем загаданое слово
+
         return words.get(random.nextInt(words.size()));
     }
 
+    public List<String> getWords() {
+        return words;
+    }
 }

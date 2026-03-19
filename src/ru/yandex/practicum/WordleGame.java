@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exeptions.NotFoundWordInDictionaryExeption;
+import ru.yandex.practicum.exeptions.OnlyRussionWordsExeption;
 import ru.yandex.practicum.exeptions.WordLengthExeption;
 
 import java.util.*;
@@ -16,13 +18,14 @@ import java.util.*;
 
 не забудьте про специальные типы исключений для игровых и неигровых ошибок
  */
+
 public class WordleGame {
     private WordleDictionary dictionary;
     private String answer;      //Правельный ответ
     private List<String> userAnswers;       // список ответов
     private int steps;      // номер попытки
     private static final int attempts = 6;
-
+    private String lastAnswer;
     private boolean isGameOver;
 
     public WordleGame(WordleDictionary dictionary) {
@@ -37,39 +40,76 @@ public class WordleGame {
         return userAnswers;
     }
 
-    public String getWord(String word) throws WordLengthExeption { // сохраняем слово в список ответов.
-        userAnswers.add(userWordValidations(word)); // если прошло валидацию.
-        return word;
+    public String getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+            NotFoundWordInDictionaryExeption { // сохраняем слово в список ответов.
+        userAnswers.add(userWordValidations(userWord)); // если прошло валидацию, сохраняем в список ответов.
+        lastAnswer = userWord; // если не пройдет валидацию выше и так будет exeption;
+        return checkIsGameOver();
     }
 
-    private String userWordValidations(String word) throws WordLengthExeption { // проверяем на длину слова
-        if (word.length() == 5) {
-            return word.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
+
+    private String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+            NotFoundWordInDictionaryExeption { // проверяем на длину слова и русские буквы
+        userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
+        if (userWord.isEmpty()) {
+             // Вызвать метод подсказки
         }
-        throw new WordLengthExeption("Слово должно состоять из 5 букв");
+        if (userWord.length() != 5) {
+            throw new WordLengthExeption("Слово должно состоять из 5 букв!");
+        }
+        if (!userWord.matches("[а-я]+")) {
+            throw new OnlyRussionWordsExeption("Слово должно состоять только из русских букв!");
+        }
+        if (!dictionary.getWords().contains(userWord)){
+            throw new NotFoundWordInDictionaryExeption("Введеного слова нет в словаре!");
+        }
+        return userWord;
     }
 
-    public String getEncryptedAnswer(String answer, String userAnswer) {
+    private boolean isCorrectAnswer() {
+        return answer.equals(lastAnswer);
+    }
+
+    private String checkIsGameOver() {              //Проверяем состояние игры.
+        if (steps == attempts) {
+            isGameOver = true;
+            return "Попытки закончились: загаданное слово " + answer;
+        } else if (isCorrectAnswer()) {
+            isGameOver = true;
+            return "Вы отгадали слово! " + answer;
+        }
+        countSteps();
+        return getEncryptedAnswer();
+    }
+
+
+    private String getEncryptedAnswer() {
         StringBuilder sb = new StringBuilder();
         Map<Character, Integer> charMap = new HashMap<>();
 
-        char[] arrayChar = answer.toCharArray();
-
-        for (Character ch : arrayChar) {
+        for (char ch : answer.toCharArray()) {
             charMap.put(ch, charMap.getOrDefault(ch, 0) + 1);
         }
 
         for (int i = 0; i < answer.length(); i++) {
-            if (answer.charAt(i) == userAnswer.charAt(i)){ // если буква есть и стоит правильно
+            if (lastAnswer.charAt(i) == answer.charAt(i)) {
                 sb.append('+');
-                charMap.put(userAnswer.charAt(i), charMap.get(userAnswer.charAt(i)) -1);
-            } else if (answer.indexOf(userAnswer.charAt(i)) == -1) { // если буквы нет
-                sb.append('-');
+                charMap.put(lastAnswer.charAt(i), charMap.get(lastAnswer.charAt(i)) - 1);
             } else {
-                if (charMap.get(userAnswer.charAt(i)) != 0){
-                    sb.append('^');
-                    charMap.put(userAnswer.charAt(i), charMap.get(userAnswer.charAt(i)) -1);
-                }
+                sb.append(' ');
+            }
+        }
+
+        for (int i = 0; i < answer.length(); i++) {
+            if (sb.charAt(i) == '+') {
+                continue;
+            }
+
+            if (!charMap.containsKey(lastAnswer.charAt(i)) || charMap.get(lastAnswer.charAt(i)) == 0) {
+                sb.setCharAt(i, '-');
+            } else {
+                sb.setCharAt(i, '^');
+                charMap.put(lastAnswer.charAt(i), charMap.get(lastAnswer.charAt(i) - 1));
             }
         }
         return sb.toString();
@@ -80,12 +120,7 @@ public class WordleGame {
         return steps++;
     }
 
-    private boolean checkIsGameOver() {              //Проверяем состояние игры.
-        if (steps == attempts && guessWordCheck() == true) {
-            return true;
-        }
-        return false;
+    public boolean isGameOver() {
+        return isGameOver;
     }
-
-
 }
