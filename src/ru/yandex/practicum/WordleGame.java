@@ -22,37 +22,38 @@ import java.util.*;
 public class WordleGame {
     private WordleDictionary dictionary;
     private String answer;      //Правельный ответ
-    private List<String> userAnswers;       // список ответов
+    private LinkedHashMap<String, String> userAnswers;       // список ответов
     private int steps;      // номер попытки
     private static final int attempts = 6;
     private String lastAnswer;
     private boolean isGameOver;
+    private HashSet<String> usedWords; // для использываемых слов.
 
     public WordleGame(WordleDictionary dictionary) {
         this.dictionary = dictionary;
         this.answer = dictionary.getWordForGame();
-        this.userAnswers = new LinkedList<>();
+        this.userAnswers = new LinkedHashMap<>();
         this.steps = 0;
         this.isGameOver = false;
+        this.usedWords = new HashSet<>();
+        System.out.println(answer);
     }
 
-    private List<String> getUserAnswers() { // подумать
-        return userAnswers;
-    }
 
     public String getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption {
-        userAnswers.add(userWordValidations(userWord)); // если прошло валидацию, сохраняем в список ответов.
-        lastAnswer = userWord; // если не пройдет валидацию выше и так будет exeption;
-        return checkIsGameOver();
+        lastAnswer = userWordValidations(userWord); // если прошло валидацию, сохраняем.
+        String encryptWord = checkIsGameOver(); // проверяем состояние игры.
+        // Если игра не закончилась получаем зашифрованную подсказку
+        userAnswers.put(lastAnswer, encryptWord); // кладем в мапу последнее польз. слово и его шифров. подсказку.
+        return encryptWord; // возвращаем шифрованную подсказку
     }
-
 
     private String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption { // проверяем на длину слова и русские буквы
         userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
         if (userWord.isEmpty()) {
-            // Вызвать метод подсказки
+            return getHelpAnswer(); // Вызвать метод подсказки
         }
         if (userWord.length() != 5) {
             throw new WordLengthExeption("Слово должно состоять из 5 букв!");
@@ -67,26 +68,37 @@ public class WordleGame {
     }
 
 
+    private String getHelpAnswer() {
+        if (steps == 0) {
+            return dictionary.getWordForGame();   // используем этот метод если ранее не вводилось слово.
+            // получаем рандомное слово из уже валидного словаря.
+        } else {
+            Map.Entry<String, String> lastEntry = userAnswers.entrySet();
+            return dictionary.getHelpWord(userAnswers.sequencedKeySet().getLast(), userAnswers.sequencedValues());
+
+        }
+    }
+
     private String checkIsGameOver() {          //Проверяем состояние игры.
-        if (steps == attempts) {
-            isGameOver = true;
-            return "Попытки закончились: загаданное слово " + answer;
-        } else if (isCorrectAnswer()) {
+        countSteps();
+        if (isCorrectAnswer()) {
             isGameOver = true;
             return "Вы отгадали слово! " + answer;
+        } else if (steps == attempts) {
+            isGameOver = true;
+            return "Попытки закончились: загаданное слово " + answer;
         }
-        countSteps();
         return getEncryptedAnswer();
+    }
+
+
+    private void countSteps() { // увеличиваем количество потраченных попыток
+        steps++;
     }
 
 
     private boolean isCorrectAnswer() {
         return answer.equals(lastAnswer);
-    }
-
-
-    private void countSteps() { // увеличиваем количество потраченых попыток
-        steps++;
     }
 
 
@@ -116,7 +128,7 @@ public class WordleGame {
                 sb.setCharAt(i, '-');
             } else {
                 sb.setCharAt(i, '^');
-                charMap.put(lastAnswer.charAt(i), charMap.get(lastAnswer.charAt(i) - 1));
+                charMap.put(lastAnswer.charAt(i), charMap.get(lastAnswer.charAt(i)) - 1);
             }
         }
         return sb.toString();
