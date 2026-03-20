@@ -27,7 +27,7 @@ public class WordleGame {
     private static final int attempts = 6;
     private String lastAnswer;
     private boolean isGameOver;
-    private HashSet<String> usedWords; // для использываемых слов.
+    private String helpWord;
 
     public WordleGame(WordleDictionary dictionary) {
         this.dictionary = dictionary;
@@ -35,25 +35,25 @@ public class WordleGame {
         this.userAnswers = new LinkedHashMap<>();
         this.steps = 0;
         this.isGameOver = false;
-        this.usedWords = new HashSet<>();
+        this.helpWord = "";
         System.out.println(answer);
     }
 
 
-    public String getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+    public void getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption {
         lastAnswer = userWordValidations(userWord); // если прошло валидацию, сохраняем.
         String encryptWord = checkIsGameOver(); // проверяем состояние игры.
         // Если игра не закончилась получаем зашифрованную подсказку
         userAnswers.put(lastAnswer, encryptWord); // кладем в мапу последнее польз. слово и его шифров. подсказку.
-        return encryptWord; // возвращаем шифрованную подсказку
     }
 
     private String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption { // проверяем на длину слова и русские буквы
         userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
         if (userWord.isEmpty()) {
-            return getHelpAnswer(); // Вызвать метод подсказки
+           helpWord = getHelpAnswer();
+           return getHelpWord();
         }
         if (userWord.length() != 5) {
             throw new WordLengthExeption("Слово должно состоять из 5 букв!");
@@ -67,15 +67,23 @@ public class WordleGame {
         return userWord;
     }
 
+    public String getHelpWord(){
+        return this.helpWord;
+    }
 
     private String getHelpAnswer() {
+
         if (steps == 0) {
             return dictionary.getWordForGame();   // используем этот метод если ранее не вводилось слово.
             // получаем рандомное слово из уже валидного словаря.
         } else {
-            Map.Entry<String, String> lastEntry = userAnswers.entrySet();
-            return dictionary.getHelpWord(userAnswers.sequencedKeySet().getLast(), userAnswers.sequencedValues());
-
+            String lastKey = "";
+            String lastValue = "";
+            for (Map.Entry<String, String> entry : userAnswers.entrySet()){ // в последней итерации будут посление слова
+                lastKey = entry.getKey();
+                lastValue = entry.getValue();
+            }
+            return dictionary.getHelpWord(lastKey, lastValue);
         }
     }
 
@@ -102,7 +110,7 @@ public class WordleGame {
     }
 
 
-    private String getEncryptedAnswer() {
+    public String getEncryptedAnswer() {
         StringBuilder sb = new StringBuilder();
         Map<Character, Integer> charMap = new HashMap<>();
 

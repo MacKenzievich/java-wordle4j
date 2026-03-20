@@ -25,7 +25,15 @@ public class Wordle {
         System.out.println("Игра началась! Введите слово:");
         while (!game.isGameOver()) {
             try {
-                System.out.println(game.getUserAnswer(scanner.nextLine()));
+                String userInput = scanner.nextLine();
+                if (userInput.isEmpty()) {
+                    game.getUserAnswer(userInput);
+                    System.out.println(game.getHelpWord());
+                    System.out.println(game.getEncryptedAnswer());
+                } else {
+                    game.getUserAnswer(userInput);
+                    System.out.println(game.getEncryptedAnswer());
+                }
             } catch (WordLengthExeption e) {
                 System.out.println(e.getMessage());
             } catch (OnlyRussionWordsExeption e) {

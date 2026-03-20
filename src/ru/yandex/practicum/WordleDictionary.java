@@ -31,17 +31,20 @@ public class WordleDictionary {
     protected String getHelpWord(String word, String encryptWord) {
         destructionWord(word, encryptWord);
         List<String> helpWords = foundValidWords(deleteWordsWithUnnecessaryLetters(foundWordsWithCorrectWord()));
-        return helpWords.get(random.nextInt(helpWords.size()));
+        System.out.println(helpWords.size());
+        if(!helpWords.isEmpty())  return helpWords.get(random.nextInt(helpWords.size()));
+        return "янезнаю";
     }
 
     private void destructionWord(String word, String encryptWord) {
         for (int i = 0; i < encryptWord.length(); i++) {
             if (encryptWord.charAt(i) == '-') {
                 unnecessaryLetters.add(word.charAt(i));
-            } else if (encryptWord.charAt(i) == '^') {
+            } else if (encryptWord.charAt(i) == '^'){
                 necessaryLetters.add(word.charAt(i));
             } else if (encryptWord.charAt(i) == '+') {
                 fixedLetters.put(i, word.charAt(i));
+                necessaryLetters.add(word.charAt(i));
             }
         }
     }
