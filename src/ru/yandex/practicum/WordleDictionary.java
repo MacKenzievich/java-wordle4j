@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exeptions.DictionaryIsEmptyExeption;
+
 import java.util.*;
 
 public class WordleDictionary {
@@ -28,28 +30,30 @@ public class WordleDictionary {
         return words;
     }
 
-    protected String getHelpWord(String word, String encryptWord) {
+    protected String getWordHint(String word, String encryptWord) throws DictionaryIsEmptyExeption {
         destructionWord(word, encryptWord);
-        List<String> helpWords = foundValidWords(deleteWordsWithUnnecessaryLetters(foundWordsWithCorrectWord()));
-        System.out.println(helpWords.size());
-        if(!helpWords.isEmpty())  return helpWords.get(random.nextInt(helpWords.size()));
-        return "янезнаю";
+        List<String> helpWords = foundValidWords(deleteWordsWithUnnecessaryLetters(foundWordsWithRequiredLetters()));
+        if (!helpWords.isEmpty()) return helpWords.get(random.nextInt(helpWords.size()));
+        throw new DictionaryIsEmptyExeption("Словарь пуст!");
     }
 
     private void destructionWord(String word, String encryptWord) {
         for (int i = 0; i < encryptWord.length(); i++) {
-            if (encryptWord.charAt(i) == '-') {
-                unnecessaryLetters.add(word.charAt(i));
-            } else if (encryptWord.charAt(i) == '^'){
-                necessaryLetters.add(word.charAt(i));
-            } else if (encryptWord.charAt(i) == '+') {
-                fixedLetters.put(i, word.charAt(i));
-                necessaryLetters.add(word.charAt(i));
+            if (encryptWord.charAt(i) == '+') {
+                fixedLetters.put(i, word.charAt(i)); // буква на нужном месте
+                necessaryLetters.add(word.charAt(i)); // если будет 2 одинаковые буквы. Она тоже нужна.
+                unnecessaryLetters.remove(word.charAt(i)); //  если буква есть в нужных удаляем из ненужных
+            } else if (encryptWord.charAt(i) == '^') {
+                necessaryLetters.add(word.charAt(i)); // буквы нужны
+                unnecessaryLetters.remove(word.charAt(i)); // та же песня
+            } else if (encryptWord.charAt(i) == '-' && !necessaryLetters.contains(word.charAt(i))) { // береженого бог бережет
+                unnecessaryLetters.add(word.charAt(i)); // буквы не нужны
+
             }
         }
     }
 
-    private List<String> foundWordsWithCorrectWord() {
+    private List<String> foundWordsWithRequiredLetters() {
         List<String> wordsWithCorrectLettersList = new LinkedList<>();
         for (String word : words) {
             boolean flag = true;
