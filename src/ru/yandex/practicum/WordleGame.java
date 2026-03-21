@@ -132,7 +132,8 @@ public class WordleGame {
     public boolean getUserRight() {
         return userRight;
     }
-    public void setAnswer (String answer){ // чисто для тестов.
+
+    public void setAnswer(String answer) { // чисто для тестов.
         this.answer = answer;
     }
 }
