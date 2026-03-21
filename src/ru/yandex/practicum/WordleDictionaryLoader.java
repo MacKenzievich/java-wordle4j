@@ -1,5 +1,6 @@
 package ru.yandex.practicum;
 
+import javax.security.auth.login.LoginException;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,8 +31,10 @@ public class WordleDictionaryLoader {       //полностью инкапсу�
             }
         } catch (FileNotFoundException e) {
             System.out.println("Файл не найден");
+            Logger.log("Произошло системное исключение: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Ошибка при работе с файлом");
+            Logger.log("Произошло системное исключение: " + e.getMessage());
         }
         return new WordleDictionary(listWords);
     }

@@ -30,19 +30,26 @@ public class Wordle {
                 }
             } catch (WordLengthExeption e) {
                 System.out.println(e.getMessage());
-
+                Logger.log("Произошло игровое исключение: " + e.getMessage());
             } catch (OnlyRussionWordsExeption e) {
                 System.out.println(e.getMessage());
+                Logger.log("Произошло игровое исключение: " + e.getMessage());
             } catch (NotFoundWordInDictionaryExeption e) {
                 System.out.println(e.getMessage());
+                Logger.log("Произошло игровое исключение: " + e.getMessage());
             } catch (DictionaryIsEmptyExeption e) {
                 System.out.println(e.getMessage());
+                Logger.log("Произошло игровое исключение: " + e.getMessage());
             }
+
+
         }
         if (game.getUserRight()) {
             System.out.println("Вы отгадали слово!");
         } else {
             System.out.println("Попытки исчерпаны :(");
         }
+        Logger.close();
+
     }
 }

@@ -32,7 +32,7 @@ public class WordleGame {
         checkGameStatus();
     }
 
-    private String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+    protected String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption, DictionaryIsEmptyExeption { // проверяем на длину слова и русские буквы
         userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
         if (userWord.isEmpty()) {   // если ввод пустой получаем подсказку.
@@ -131,5 +131,8 @@ public class WordleGame {
 
     public boolean getUserRight() {
         return userRight;
+    }
+    public void setAnswer (String answer){ // чисто для тестов.
+        this.answer = answer;
     }
 }

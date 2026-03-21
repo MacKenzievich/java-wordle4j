@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class Logger {   // не очень понял, что хотят в задании по поводу логирования. зачем его предавать во все классы?
+public class Logger {   // Не очень понял, что хотят в задании по поводу логирования. зачем его предавать во все классы?
     // Делаю его статическим, чтобы логировать из любой части программы.
     private static PrintWriter writer;
 
