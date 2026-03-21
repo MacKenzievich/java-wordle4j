@@ -1,6 +1,5 @@
 package ru.yandex.practicum;
 
-import javax.security.auth.login.LoginException;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +11,7 @@ public class WordleDictionaryLoader {       //полностью инкапсу�
     private WordleDictionary dictionary;
 
     public WordleDictionaryLoader() {
+
         this.dictionary = fileLoader();
     }
 
