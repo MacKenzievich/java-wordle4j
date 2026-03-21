@@ -19,8 +19,7 @@ public class WordleDictionaryLoader {       //полностью инкапсу�
         return dictionary;
     }
 
-    private WordleDictionary fileLoader()
-    {
+    private WordleDictionary fileLoader() {
         List<String> listWords = new LinkedList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("words_ru.txt"), encoding))) {
             String line;
