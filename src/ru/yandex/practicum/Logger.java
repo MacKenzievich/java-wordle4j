@@ -21,6 +21,7 @@ public class Logger implements AutoCloseable {   // Не очень понял, 
             writer.println(message);
         }
     }
+
     @Override
     public void close() {
         if (writer != null) {
