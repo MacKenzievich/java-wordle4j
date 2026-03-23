@@ -14,8 +14,9 @@ public class WordleGame {
     private String suggestedWord;
     private String userInput;
     private boolean userRight;
+    private Logger logger;
 
-    public WordleGame(WordleDictionary dictionary) {
+    public WordleGame(WordleDictionary dictionary, Logger logger) {
         this.dictionary = dictionary;
         this.answer = dictionary.getWordForGame();
         this.userAnswers = new LinkedHashMap<>();
@@ -23,6 +24,7 @@ public class WordleGame {
         this.isGameOver = false;
         this.suggestedWord = "";
         this.userRight = false;
+        this.logger = logger;
     }
 
 
@@ -34,17 +36,20 @@ public class WordleGame {
 
     protected String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
             NotFoundWordInDictionaryExeption, DictionaryIsEmptyExeption { // проверяем на длину слова и русские буквы
-        userWord = userWord.toLowerCase(); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
+        userWord = WordleDictionaryLoader.letterReplace(userWord); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
         if (userWord.isEmpty()) {   // если ввод пустой получаем подсказку.
             return getAnswerHint();
         }
-        if (userWord.length() != 5) {
+        if (userWord.length() != WordleDictionaryLoader.MAX_WORD_LENGTH) {
+            logger.log("Произошло игровое исключение : Слово должно состоять из 5 букв!");
             throw new WordLengthExeption("Слово должно состоять из 5 букв!");
         }
         if (!userWord.matches("[а-я]+")) {
+            logger.log("Произошло игровое исключение : Слово должно состоять только из русских букв!");
             throw new OnlyRussionWordsExeption("Слово должно состоять только из русских букв!");
         }
         if (!dictionary.getWords().contains(userWord)) {
+            logger.log("Произошло игровое исключение : Введенного слова нет в словаре!");
             throw new NotFoundWordInDictionaryExeption("Введенного слова нет в словаре!");
         }
 

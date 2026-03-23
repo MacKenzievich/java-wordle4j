@@ -19,8 +19,9 @@ public class WordleGameTest {
 
     @BeforeEach
     void setUp() {
+        Logger logger = new Logger();
         dict = new WordleDictionary(List.of("спать", "птица", "сжать", "панда", "торта", "зебра"));
-        game = new WordleGame(dict);
+        game = new WordleGame(dict, logger);
     }
 
     @Test

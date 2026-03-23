@@ -22,7 +22,6 @@ public class WordleDictionary {
     }
 
     protected String getWordForGame() {   // получаем загаданое слово
-
         return words.get(random.nextInt(words.size()));
     }
 
@@ -33,7 +32,9 @@ public class WordleDictionary {
     protected String getWordHint(String word, String encryptWord) throws DictionaryIsEmptyExeption {
         destructionWord(word, encryptWord);
         List<String> helpWords = foundValidWords(deleteWordsWithUnnecessaryLetters(foundWordsWithRequiredLetters()));
-        if (!helpWords.isEmpty()) return helpWords.get(random.nextInt(helpWords.size()));
+        if (!helpWords.isEmpty()) {
+            return helpWords.get(random.nextInt(helpWords.size()));
+        }
         throw new DictionaryIsEmptyExeption("Словарь пуст!");
     }
 
@@ -63,7 +64,9 @@ public class WordleDictionary {
                     break;
                 }
             }
-            if (flag) wordsWithCorrectLettersList.add(word);
+            if (flag) {
+                wordsWithCorrectLettersList.add(word);
+            }
         }
         return wordsWithCorrectLettersList;
     }
@@ -80,7 +83,9 @@ public class WordleDictionary {
                     break;
                 }
             }
-            if (flag) iterator.remove();
+            if (flag) {
+                iterator.remove();
+            }
         }
         return list;
     }
@@ -96,7 +101,9 @@ public class WordleDictionary {
                     break;
                 }
             }
-            if (flag) iterator.remove();
+            if (flag) {
+                iterator.remove();
+            }
         }
         return list;
     }

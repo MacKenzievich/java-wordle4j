@@ -10,15 +10,14 @@ import java.util.Scanner;
 public class Wordle {
 
     public static void main(String[] args) {
-        Logger.init("log_file.txt");
-        WordleDictionaryLoader loader = new WordleDictionaryLoader();
-        WordleDictionary dictionary = loader.getDictionary(); // получили валидный список слов
-        WordleGame game = new WordleGame(dictionary);
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Игра началась! Введите слово:");
-        Logger.log("Игра началась!");
-        while (!game.isGameOver()) {
-            try {
+        try (Scanner scanner = new Scanner(System.in); Logger logger = new Logger()) {
+            logger.init("log_file.txt");
+            WordleDictionaryLoader loader = new WordleDictionaryLoader(logger);
+            WordleDictionary dictionary = loader.getDictionary(); // получили валидный список слов
+            WordleGame game = new WordleGame(dictionary, logger);
+            System.out.println("Игра началась! Введите слово:");
+            logger.log("Игра началась!");
+            while (!game.isGameOver()) {
                 String userInput = scanner.nextLine();
                 if (userInput.isEmpty()) {
                     game.getUserAnswer(userInput);
@@ -28,28 +27,22 @@ public class Wordle {
                     game.getUserAnswer(userInput);
                     System.out.println(game.getEncryptedAnswer());
                 }
-            } catch (WordLengthExeption e) {
-                System.out.println(e.getMessage());
-                Logger.log("Произошло игровое исключение: " + e.getMessage());
-            } catch (OnlyRussionWordsExeption e) {
-                System.out.println(e.getMessage());
-                Logger.log("Произошло игровое исключение: " + e.getMessage());
-            } catch (NotFoundWordInDictionaryExeption e) {
-                System.out.println(e.getMessage());
-                Logger.log("Произошло игровое исключение: " + e.getMessage());
-            } catch (DictionaryIsEmptyExeption e) {
-                System.out.println(e.getMessage());
-                Logger.log("Произошло игровое исключение: " + e.getMessage());
             }
-
-
+            if (game.getUserRight()) {
+                System.out.println("Вы отгадали слово!");
+            } else {
+                System.out.println("Попытки исчерпаны :(");
+            }
+        } catch (WordLengthExeption e) {
+            System.out.println(e.getMessage());
+        } catch (OnlyRussionWordsExeption e) {
+            System.out.println(e.getMessage());
+        } catch (NotFoundWordInDictionaryExeption e) {
+            System.out.println(e.getMessage());
+        } catch (DictionaryIsEmptyExeption e) {
+            System.out.println(e.getMessage());
         }
-        if (game.getUserRight()) {
-            System.out.println("Вы отгадали слово!");
-        } else {
-            System.out.println("Попытки исчерпаны :(");
-        }
-        Logger.close();
+
 
     }
 }

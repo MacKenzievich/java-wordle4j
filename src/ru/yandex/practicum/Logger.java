@@ -4,11 +4,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class Logger {   // Не очень понял, что хотят в задании по поводу логирования. зачем его предавать во все классы?
+public class Logger implements AutoCloseable {   // Не очень понял, что хотят в задании по поводу логирования. зачем его предавать во все классы?
     // Делаю его статическим, чтобы логировать из любой части программы.
     private static PrintWriter writer;
 
-    public static void init(String filename) {
+    public void init(String filename) {
         try {
             writer = new PrintWriter(new FileWriter(filename, true), true);
         } catch (IOException e) {
@@ -16,13 +16,13 @@ public class Logger {   // Не очень понял, что хотят в за
         }
     }
 
-    public static void log(String message) {
+    public void log(String message) {
         if (writer != null) {
             writer.println(message);
         }
     }
-
-    public static void close() {
+    @Override
+    public void close() {
         if (writer != null) {
             writer.close();
         }

@@ -9,9 +9,11 @@ import java.util.List;
 public class WordleDictionaryLoader {       //полностью инкапсулировали класс
     private static final Charset encoding = StandardCharsets.UTF_8;
     private WordleDictionary dictionary;
+    private Logger logger;
+    public static final int MAX_WORD_LENGTH = 5;  //вынес в константу
 
-    public WordleDictionaryLoader() {
-
+    public WordleDictionaryLoader(Logger logger) {
+        this.logger = logger;
         this.dictionary = fileLoader();
     }
 
@@ -30,20 +32,20 @@ public class WordleDictionaryLoader {       //полностью инкапсу�
             }
         } catch (FileNotFoundException e) {
             System.out.println("Файл не найден");
-            Logger.log("Произошло системное исключение: " + e.getMessage());
+            logger.log("Произошло системное исключение: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("Ошибка при работе с файлом");
-            Logger.log("Произошло системное исключение: " + e.getMessage());
+            logger.log("Произошло системное исключение: " + e.getMessage());
         }
         return new WordleDictionary(listWords);
     }
 
     private boolean stringValidation(String string) {  // проверяем длину строки.
-        return string.length() == 5;
+        return string.length() == MAX_WORD_LENGTH;
     }
 
-    private String letterReplace(String word) { // все в нижний регистр и заменяем буквы.
-        word = word.toLowerCase().replace('ё', 'е');
+    public static String letterReplace(String word) { // все в нижний регистр и заменяем буквы.
+        word = word.toLowerCase().replace('ё', 'е').trim();
         return word;
     }
 }
