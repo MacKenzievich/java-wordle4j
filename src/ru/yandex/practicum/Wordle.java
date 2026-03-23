@@ -14,35 +14,35 @@ public class Wordle {
             logger.init("log_file.txt");
             WordleDictionaryLoader loader = new WordleDictionaryLoader(logger);
             WordleDictionary dictionary = loader.getDictionary(); // получили валидный список слов
+
             WordleGame game = new WordleGame(dictionary, logger);
             System.out.println("Игра началась! Введите слово:");
             logger.log("Игра началась!");
+
             while (!game.isGameOver()) {
                 String userInput = scanner.nextLine();
+                try {
+                    // Обработка исключений для следующего ввода
+                    game.getUserAnswer(userInput);
+                } catch (WordLengthExeption | OnlyRussionWordsExeption | NotFoundWordInDictionaryExeption |
+                         DictionaryIsEmptyExeption e) {
+                    System.out.println("Ошибка: " + e.getMessage());
+                    continue; // пропускаем текущий цикл и ждем нового ввода
+                }
+
+                System.out.println(game.getEncryptedAnswer());
+
+                // если пользователь ввёл пустое слово, показываем подсказку
                 if (userInput.isEmpty()) {
-                    game.getUserAnswer(userInput);
                     System.out.println(game.getSuggestedWord());
-                    System.out.println(game.getEncryptedAnswer());
-                } else {
-                    game.getUserAnswer(userInput);
-                    System.out.println(game.getEncryptedAnswer());
                 }
             }
+
             if (game.getUserRight()) {
                 System.out.println("Вы отгадали слово!");
             } else {
                 System.out.println("Попытки исчерпаны :(");
             }
-        } catch (WordLengthExeption e) {
-            System.out.println(e.getMessage());
-        } catch (OnlyRussionWordsExeption e) {
-            System.out.println(e.getMessage());
-        } catch (NotFoundWordInDictionaryExeption e) {
-            System.out.println(e.getMessage());
-        } catch (DictionaryIsEmptyExeption e) {
-            System.out.println(e.getMessage());
         }
-
-
     }
 }
