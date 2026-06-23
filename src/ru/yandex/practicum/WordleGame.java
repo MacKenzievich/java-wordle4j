@@ -1,23 +1,144 @@
 package ru.yandex.practicum;
 
-/*
-в этом классе хранится словарь и состояние игры
-    текущий шаг
-    всё что пользователь вводил
-    правильный ответ
+import ru.yandex.practicum.exeptions.*;
 
-в этом классе нужны методы, которые
-    проанализируют совпадение слова с ответом
-    предложат слово-подсказку с учётом всего, что вводил пользователь ранее
+import java.util.*;
 
-не забудьте про специальные типы исключений для игровых и неигровых ошибок
- */
 public class WordleGame {
-
-    private String answer;
-
-    private int steps;
-
     private WordleDictionary dictionary;
+    private String answer;      //Правильный ответ
+    private LinkedHashMap<String, String> userAnswers;   // список ответов K - слово V - его символьное представление
+    private int steps;      // номер попытки
+    private static final int attempts = 6; // максимальное количество попыток
+    private boolean isGameOver;  // игра закончилась?
+    private String suggestedWord;
+    private String userInput;
+    private boolean userRight;
+    private Logger logger;
 
+    public WordleGame(WordleDictionary dictionary, Logger logger) {
+        this.dictionary = dictionary;
+        this.answer = dictionary.getWordForGame();
+        this.userAnswers = new LinkedHashMap<>();
+        this.steps = 0;
+        this.isGameOver = false;
+        this.suggestedWord = "";
+        this.userRight = false;
+        this.logger = logger;
+    }
+
+
+    public void getUserAnswer(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+            NotFoundWordInDictionaryExeption, DictionaryIsEmptyExeption {
+        userInput = userWordValidations(userWord); // если прошло валидацию, сохраняем в поле.
+        checkGameStatus();
+    }
+
+    protected String userWordValidations(String userWord) throws WordLengthExeption, OnlyRussionWordsExeption,
+            NotFoundWordInDictionaryExeption, DictionaryIsEmptyExeption { // проверяем на длину слова и русские буквы
+        userWord = WordleDictionaryLoader.letterReplace(userWord); // Не вижу смысла проверять на регистр. Просто приведём всё к одному.
+        if (userWord.isEmpty()) {   // если ввод пустой получаем подсказку.
+            return getAnswerHint();
+        }
+        if (userWord.length() != WordleDictionaryLoader.MAX_WORD_LENGTH) {
+            logger.log("Произошло игровое исключение : Слово должно состоять из 5 букв!");
+            throw new WordLengthExeption("Слово должно состоять из 5 букв!");
+        }
+        if (!userWord.matches("[а-я]+")) {
+            logger.log("Произошло игровое исключение : Слово должно состоять только из русских букв!");
+            throw new OnlyRussionWordsExeption("Слово должно состоять только из русских букв!");
+        }
+        if (!dictionary.getWords().contains(userWord)) {
+            logger.log("Произошло игровое исключение : Введенного слова нет в словаре!");
+            throw new NotFoundWordInDictionaryExeption("Введенного слова нет в словаре!");
+        }
+
+        return userWord;
+    }
+
+    private String getAnswerHint() throws DictionaryIsEmptyExeption {
+        if (steps == 0) {
+            suggestedWord = dictionary.getWordForGame(); // получаем рандомное слово из уже валидного словаря.
+            return suggestedWord;
+
+        } else {
+            String lastKey = "";
+            String lastValue = "";
+            for (Map.Entry<String, String> entry : userAnswers.entrySet()) { // в последней итерации будут последние слова
+                lastKey = entry.getKey();
+                lastValue = entry.getValue();
+            }
+            suggestedWord = dictionary.getWordHint(lastKey, lastValue);
+            return suggestedWord;
+        }
+    }
+
+    private void checkGameStatus() {          //Проверяем состояние игры.
+        countSteps();
+        if (isCorrectAnswer()) {
+            userRight = true;  // для вывода сообщения по окончании игры
+            isGameOver = true;
+        } else if (steps == attempts) {
+            isGameOver = true;
+        }
+    }
+
+    private void countSteps() { // увеличиваем количество потраченных попыток
+        steps++;
+    }
+
+    private boolean isCorrectAnswer() {
+        return answer.equals(userInput);
+    }
+
+
+    public String getEncryptedAnswer() {
+        StringBuilder sb = new StringBuilder();
+        Map<Character, Integer> charMap = new HashMap<>();
+
+        for (char ch : answer.toCharArray()) {
+            charMap.put(ch, charMap.getOrDefault(ch, 0) + 1);
+        }
+
+        for (int i = 0; i < answer.length(); i++) {
+            if (userInput.charAt(i) == answer.charAt(i)) {
+                sb.append('+');
+                charMap.put(userInput.charAt(i), charMap.get(userInput.charAt(i)) - 1);
+            } else {
+                sb.append(' ');
+            }
+        }
+
+        for (int i = 0; i < answer.length(); i++) {
+            if (sb.charAt(i) == '+') {
+                continue;
+            }
+
+            if (!charMap.containsKey(userInput.charAt(i)) || charMap.get(userInput.charAt(i)) == 0) {
+                sb.setCharAt(i, '-');
+            } else {
+                sb.setCharAt(i, '^');
+                charMap.put(userInput.charAt(i), charMap.get(userInput.charAt(i)) - 1);
+            }
+        }
+        String encryptedWord = sb.toString();
+        userAnswers.put(userInput, encryptedWord);
+        return encryptedWord;
+    }
+
+    public String getSuggestedWord() {
+        return suggestedWord;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public boolean getUserRight() {
+        return userRight;
+    }
+
+    public void setAnswer(String answer) { // чисто для тестов.
+        this.answer = answer;
+    }
 }
